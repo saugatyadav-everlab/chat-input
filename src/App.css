@@ -18,6 +18,11 @@
   gap: 80px;
 }
 
+/* pin the field to the bottom (real chat UI) — it grows upward, input stays put */
+.stage__center--bottom {
+  align-items: flex-end;
+}
+
 /* two theme halves: dark on top, light on the bottom */
 .stage__split {
   min-height: 100vh;

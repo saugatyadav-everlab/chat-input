@@ -1,0 +1,98 @@
+/* ===== Reply-mode input: chat field with an animated header on top ===== */
+.rf {
+  width: min(720px, calc(100vw - 32px)); /* matches ChatInput's .ci width */
+  border-radius: var(--radius-4xl);
+  background: var(--bg-tertiary);
+  /* overflow visible so the input-field glow can bloom; the header height
+     animation is clipped by .rf-header itself */
+  overflow: visible;
+}
+/* the nested ChatInput fills the outer container (tertiary-on-tertiary two-tone) */
+.rf .ci {
+  width: 100%;
+  max-width: none;
+}
+
+/* animated header wrapper (Framer animates height/opacity) */
+.rf-header {
+  overflow: hidden;
+}
+.rf-header__inner {
+  padding: 12px; /* space/xs */
+}
+
+/* ---- Care team: "Replying to …" prefix ---- */
+.rf-prefix {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rf-avatar {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+.rf-replying {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rf-replying__label {
+  font-size: 12px;
+  line-height: 14px;
+  color: var(--fg-tertiary);
+}
+.rf-replying__name {
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 570;
+  color: var(--fg-primary);
+}
+.rf-eta {
+  flex: none;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--fg-tertiary);
+  white-space: nowrap;
+}
+
+/* ---- Eva: "Done asking Eva?" suggestion ---- */
+.rf-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 6px;
+}
+.rf-suggestion__icon {
+  flex: none;
+  color: var(--fg-primary);
+  display: inline-flex;
+}
+.rf-suggestion__text {
+  flex: 1 0 0;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--fg-primary);
+}
+.rf-suggestion__cta {
+  flex: none;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px; /* space/2xs */
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--fg-primary); /* black in light, white in dark */
+  color: var(--screen-bg);
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 570;
+  cursor: pointer;
+  white-space: nowrap;
+}
+

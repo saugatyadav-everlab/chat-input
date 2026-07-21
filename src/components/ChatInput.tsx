@@ -18,6 +18,7 @@ export interface ChatInputProps {
   onFocus: () => void;
   onBlur: () => void;
   onSubmit: () => void;
+  placeholder?: string;
   /** Spring for the recipient-button width resize */
   resizeTransition: Transition;
   /** Spring for the vertical word roll */
@@ -56,7 +57,7 @@ function Submit({ state, onSubmit }: { state: FieldState; onSubmit: () => void }
 
 export default function ChatInput({
   state, recipient, onRecipientChange, type, value, onValueChange,
-  onFocus, onBlur, onSubmit, resizeTransition, rollTransition, roll,
+  onFocus, onBlur, onSubmit, placeholder = PLACEHOLDER, resizeTransition, rollTransition, roll,
 }: ChatInputProps) {
   const isMulti = type === 'Multi line';
   const taRef = useRef<HTMLTextAreaElement>(null);
@@ -100,7 +101,7 @@ export default function ChatInput({
 
   const commonInputProps = {
     className: 'ci-input',
-    placeholder: PLACEHOLDER,
+    placeholder,
     value,
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       onValueChange(e.target.value),

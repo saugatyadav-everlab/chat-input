@@ -10,12 +10,16 @@ import type { BeamSettings } from './beam';
 export function Beam({
   settings,
   children,
+  fill = false,
 }: {
   settings: BeamSettings;
   children: ReactNode;
+  /** span the parent's width (so it wraps a full-width field) */
+  fill?: boolean;
 }) {
   const style = {
     '--beam-hue-base': `${settings.hueBase}deg`,
+    ...(fill ? { display: 'block', width: '100%' } : null),
   } as CSSProperties;
 
   return (

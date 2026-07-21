@@ -143,7 +143,7 @@ export function RecipientDropdown({ open, anchorRef, recipient, onSelect, onClos
       <div className="rd__slot" />
       <div className="rd__list">
         {item('Copilot', <AiIcon />, 'Eva', 'Answers immediately', true, 'AI')}
-        {item('Care team', <UsersIcon />, 'Everlab Care Team', 'Replies in 1-3 business days', false)}
+        {item('Care team', <UsersIcon />, 'Care team', 'Replies in 1-3 business days', false)}
       </div>
       <div className="rd__slot" />
     </div>,
