@@ -1,0 +1,238 @@
+/* ===== Chat input field — 1:1 with the Figma component ===== */
+
+/* icon frame + exact-inset glyph (matches Figma's Icon > Union/Vector nesting) */
+.icon {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  color: inherit;
+}
+.icon__glyph {
+  position: absolute;
+  display: block;
+}
+
+.ci {
+  width: 720px;
+  max-width: calc(100vw - 32px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--bg-tertiary);
+  color: var(--fg-primary);
+  transition: background 0.25s ease;
+}
+
+.ci--multi {
+  border-radius: var(--radius-4xl); /* 24px */
+}
+.ci--single {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px; /* space/xs */
+  padding: 8px; /* space/2xs */
+  border-radius: var(--radius-full);
+}
+
+.ci--elevated {
+  background: var(--card-elevated-bg);
+  box-shadow: var(--card-elevated-shadow);
+}
+
+/* ---- editable input / placeholder ---- */
+.ci-textrow {
+  display: flex;
+  align-items: center;
+  padding: 20px 20px 16px; /* pt md, px md, pb sm */
+}
+.ci-input {
+  flex: 1 0 0;
+  min-width: 0;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--fg-primary); /* filled text = primary */
+  font-family: inherit;
+  font-size: 16px; /* body/300 */
+  line-height: 20px;
+  padding: 0;
+  margin: 0;
+  caret-color: var(--fg-primary);
+}
+.ci-input::placeholder {
+  color: var(--fg-tertiary); /* placeholder = tertiary */
+  opacity: 1;
+}
+textarea.ci-input {
+  display: block;
+  resize: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* ---- actions row (multi line) ---- */
+.ci-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px 12px; /* pt 4xs, px xs, pb xs */
+}
+.ci-chatbtn {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* space/3xs */
+}
+
+/* ---- 36px icon button (plus) ---- */
+.ci-iconbtn {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  color: var(--fg-primary);
+  backdrop-filter: blur(128px);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.ci-iconbtn:hover {
+  opacity: 0.8;
+}
+
+/* ---- recipient pill (Button / Label) ---- */
+.ci-pill {
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; /* interactive/gap/sm */
+  padding: 0 16px; /* space/sm */
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  color: var(--fg-primary);
+  backdrop-filter: blur(128px);
+  cursor: pointer;
+  white-space: nowrap;
+}
+/* the vertical "roll" window — clips each word as it rolls in/out */
+.ci-pill__word {
+  position: relative;
+  display: inline-block;
+  height: 20px;
+  /* clip the roll, but let the blur bleed past the edges (paint-only, no layout shift)
+     so the blurred word doesn't hard-clip on the right */
+  overflow: clip;
+  overflow-clip-margin: 10px;
+  vertical-align: middle;
+}
+/* invisible spacer that sizes the window on mount and is measured for the width anim.
+   inline-block so it shrinks to the text (not the animated parent width). */
+.ci-pill__sizer {
+  visibility: hidden;
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 570;
+}
+/* each word is its own absolutely-positioned rigid block (only translate/blur — no
+   scale). Anchored right (the fixed chevron side) so the width resize never slides it
+   sideways — it only rolls vertically. */
+.ci-pill__wordItem {
+  position: absolute;
+  right: 0;
+  top: 0;
+  white-space: nowrap;
+  font-size: 14px; /* label/200 */
+  line-height: 20px;
+  font-weight: 570; /* font/weight/medium */
+  will-change: transform, filter;
+}
+.ci-pill__chev {
+  color: var(--fg-primary);
+}
+
+/* ---- submit button (36px) ---- */
+.ci-submit {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(128px);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.ci-submit--solid {
+  background: var(--submit-bg); /* black in light, white in dark */
+  color: var(--submit-fg);
+}
+.ci-submit--ghost {
+  background: var(--bg-tertiary);
+  color: var(--fg-primary);
+}
+.ci-submit--disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ---- attachment (multi line) ---- */
+.ci-attach {
+  padding: 12px 12px 0; /* pt xs, px xs */
+}
+.ci-attach__card {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* space/2xs */
+  padding: 8px;
+  width: max-content;
+  max-width: 100%;
+  border-radius: var(--radius-lg); /* 12px */
+  background: var(--bg-tertiary);
+}
+.ci-attach__thumb {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-xl); /* 14px */
+  object-fit: cover;
+}
+.ci-attach__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px; /* space/3xs */
+  padding-right: 8px;
+}
+.ci-attach__name {
+  font-size: 14px; /* body/200 */
+  line-height: 18px;
+  color: var(--fg-primary);
+}
+.ci-attach__type {
+  font-size: 12px; /* label/100 */
+  line-height: 14px;
+  color: var(--fg-tertiary);
+}
+.ci-attach__close {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--fg-primary);
+  backdrop-filter: blur(128px);
+  cursor: pointer;
+}

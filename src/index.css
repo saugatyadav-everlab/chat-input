@@ -1,0 +1,102 @@
+/* ---- Design tokens (from Figma), theme-flipping ---- */
+:root {
+  /* 'Saans' is the Figma family; if it isn't installed locally we fall back to
+     self-hosted Inter Variable (a close grotesque) so weights like 570 render right. */
+  --font-sans: 'Saans', 'Inter Variable', 'Inter', -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  /* radii */
+  --radius-full: 10000px;
+  --radius-4xl: 24px;
+  --radius-xl: 14px;
+  --radius-lg: 12px;
+}
+
+/* Light (white screen) — the Figma default */
+:root,
+[data-theme='light'] {
+  --screen-bg: #ffffff;
+  --fg-primary: #000000;
+  --fg-tertiary: rgba(0, 0, 0, 0.48);
+  --bg-tertiary: rgba(0, 0, 0, 0.04);
+  --card-elevated-bg: #ffffff;
+  --card-elevated-shadow: 0 1px 1px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(0, 0, 0, 0.06);
+  --hairline: rgba(0, 0, 0, 0.08);
+  /* filled submit: black circle, light icon — inverts in dark mode */
+  --submit-bg: #000000;
+  --submit-fg: #ffffff;
+  --chip-bg: rgba(0, 0, 0, 0.04);
+  --chip-bg-active: #000000;
+  --chip-fg: rgba(0, 0, 0, 0.6);
+  --chip-fg-active: #ffffff;
+  --panel-label: rgba(0, 0, 0, 0.55);
+  --modal-bg: #ffffff;
+  --modal-border: rgba(0, 0, 0, 0.1);
+  --modal-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.06),
+    0 4px 6px -4px rgba(0, 0, 0, 0.06);
+  --halo: #9da1ef; /* Figma periwinkle "temporary halo" */
+}
+
+/* Dark (black screen) */
+[data-theme='dark'] {
+  --screen-bg: #000000;
+  --fg-primary: #ffffff;
+  --fg-tertiary: rgba(255, 255, 255, 0.5);
+  --bg-tertiary: rgba(255, 255, 255, 0.07);
+  --card-elevated-bg: #1a1a1a;
+  --card-elevated-shadow: 0 1px 1px rgba(0, 0, 0, 0.4),
+    0 12px 32px rgba(0, 0, 0, 0.5);
+  --hairline: rgba(255, 255, 255, 0.1);
+  --submit-bg: #ffffff;
+  --submit-fg: #000000;
+  --chip-bg: rgba(255, 255, 255, 0.08);
+  --chip-bg-active: #ffffff;
+  --chip-fg: rgba(255, 255, 255, 0.6);
+  --chip-fg-active: #000000;
+  --panel-label: rgba(255, 255, 255, 0.55);
+  --modal-bg: #1c1c1e;
+  --modal-border: rgba(255, 255, 255, 0.12);
+  --modal-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
+    0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --halo: #9da1ef;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--screen-bg);
+  color: var(--fg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* Form controls don't inherit font-family by default — force it so buttons
+   (e.g. the recipient pill) use the app font instead of the UA default. */
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+  -webkit-font-smoothing: inherit;
+}
+
+/* A "static" beam: pause the traveling/breathing CSS animations so the beam is
+   shown but frozen. (border-beam draws its layers on ::before/::after and the
+   [data-beam-bloom] child of the wrapper.) */
+.beam-freeze::before,
+.beam-freeze::after,
+.beam-freeze [data-beam-bloom] {
+  animation-play-state: paused !important;
+}

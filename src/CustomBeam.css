@@ -1,0 +1,56 @@
+/* ===== Dependency-free rotating gradient border (Figma halo look) ===== */
+.nb {
+  position: relative;
+  display: inline-block; /* hug the wrapped element */
+}
+.nb__content {
+  position: relative;
+  z-index: 1;
+}
+
+/* both the crisp stroke and the glow's inner ring are the gradient masked to a
+   border ring (padding-box XOR border-box) */
+.nb__beam,
+.nb__glow-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--nb-radius);
+  background: var(--nb-grad);
+  pointer-events: none;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* crisp 1px stroke on the edge */
+.nb__beam {
+  z-index: 2;
+  padding: var(--nb-thickness);
+  filter: var(--nb-color-filter, none);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* blurred 2px border behind — the blur lives on THIS wrapper (not the masked ring)
+   so the bloom spreads outside the border instead of being clipped by the mask */
+.nb__glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  filter: var(--nb-color-filter, none) blur(var(--nb-glow));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.nb__glow-ring {
+  padding: calc(var(--nb-thickness) + 1px);
+}
+
+.nb--active .nb__beam {
+  opacity: var(--nb-strength, 1);
+}
+.nb--active .nb__glow {
+  opacity: var(--nb-blur-opacity, 0.32);
+}
