@@ -1,7 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './RecipientDropdown.css';
+import { CustomBeam } from '../CustomBeam';
 import type { Recipient } from './ChatInput';
+
+// same angular gradient as the Custom Beam
+const HALO_COLORS = ['#E1915F', '#FFCBAB', '#C4B8FF', '#F37938'];
 
 /* ---- icons (exact Figma vectors, currentColor) ---- */
 function AiIcon() {
@@ -44,6 +48,8 @@ interface Props {
 export function RecipientDropdown({ open, anchorRef, recipient, onSelect, onClose }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ left: number; bottom: number } | null>(null);
+  // the dropdown is portaled to <body>, so inherit the theme of the field it opened from
+  const [theme, setTheme] = useState<string | undefined>(undefined);
 
   // position above the pill, right-aligned, clamped to the viewport
   useLayoutEffect(() => {
@@ -53,6 +59,7 @@ export function RecipientDropdown({ open, anchorRef, recipient, onSelect, onClos
     const left = Math.min(Math.max(8, r.right - width), window.innerWidth - width - 8);
     const bottom = window.innerHeight - r.top + 8;
     setPos({ left, bottom });
+    setTheme(anchorRef.current.closest('[data-theme]')?.getAttribute('data-theme') ?? undefined);
   }, [open, anchorRef]);
 
   useEffect(() => {
@@ -92,8 +99,23 @@ export function RecipientDropdown({ open, anchorRef, recipient, onSelect, onClos
       }}
     >
       <span className="rd-item__icon">
-        <span className="rd-tile">{icon}</span>
-        {halo && <span className="rd-halo" aria-hidden />}
+        {halo ? (
+          <CustomBeam
+            active
+            colors={HALO_COLORS}
+            spread={360}
+            thickness={1}
+            strength={0.72}
+            glow={6}
+            blurOpacity={0.35}
+            duration={3}
+            radius={14}
+          >
+            <span className="rd-tile">{icon}</span>
+          </CustomBeam>
+        ) : (
+          <span className="rd-tile">{icon}</span>
+        )}
       </span>
       <span className="rd-item__content">
         <span className="rd-item__titlerow">
@@ -114,6 +136,7 @@ export function RecipientDropdown({ open, anchorRef, recipient, onSelect, onClos
     <div
       ref={ref}
       className="rd"
+      data-theme={theme}
       role="menu"
       style={{ position: 'fixed', left: pos.left, bottom: pos.bottom }}
     >
