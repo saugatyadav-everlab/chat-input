@@ -68,7 +68,7 @@ export default function ReplyMode() {
   };
 
   const cfg = useDialKit('Header entry', {
-    transition: { type: 'spring', bounce: 0.2, visualDuration: 0.3 },
+    transition: { type: 'spring', bounce: 0.35, visualDuration: 0.3 },
     stagger: [0.1, 0, 0.3, 0.01], // delay between banner children
     childDelay: [0.08, 0, 0.5, 0.01], // wait for the banner to start opening
     childShift: [8, 0, 32, 1], // how far each child slides up (px)
