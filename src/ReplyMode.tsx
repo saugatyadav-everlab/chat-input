@@ -23,6 +23,19 @@ export default function ReplyMode() {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
+  // press "r" to toggle recipient (ignored while typing / with a modifier held)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'r' && e.key !== 'R') return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = document.activeElement as HTMLElement | null;
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+      setRecipient((r) => (r === 'Copilot' ? 'Care team' : 'Copilot'));
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
   // switching to Eva flashes the container beam (same signal as the base page)
   const [evaSignal, setEvaSignal] = useState(false);
   const evaTimer = useRef<number | undefined>(undefined);

@@ -54,6 +54,7 @@
 }
 .rf-eta {
   flex: none;
+  padding-right: 4px;
   font-size: 14px;
   line-height: 18px;
   color: var(--fg-tertiary);
