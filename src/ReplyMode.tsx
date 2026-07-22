@@ -86,9 +86,9 @@ export default function ReplyMode() {
   });
   const morphTx = morphCfg.transition as unknown as Transition;
   const revealCfg = useDialKit('Banner reveal', {
-    transition: { type: 'spring', bounce: 0.2, visualDuration: 0.3 },
-    childDelay: [0.02, 0, 0.5, 0.01], // children wait for the banner to open, THEN scale in (so the scale is visible, not masked by the reveal)
-    collapseDelay: [0.1, 0, 0.5, 0.01], // slight lead so children start leaving, then the banner drops (overlapping)
+    transition: { type: 'spring', bounce: 0.25, visualDuration: 0.3 },
+    childDelay: [0.04, 0, 0.5, 0.01], // children wait for the banner to open, THEN scale in (so the scale is visible, not masked by the reveal)
+    collapseDelay: [0.12, 0, 0.5, 0.01], // slight lead so children start leaving, then the banner drops (overlapping)
   });
   const revealTx = revealCfg.transition as unknown as Transition;
 
