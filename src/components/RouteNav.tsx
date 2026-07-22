@@ -1,16 +1,16 @@
 import './RouteNav.css';
 
 const ROUTES = [
-  { href: '/beams', label: 'Beams' },
-  { href: '/reply', label: 'Reply' },
+  { href: '/input', label: 'Input' },
+  { href: '/header', label: 'Header' },
 ];
 
 /**
- * Fixed top-center route switcher shared by the prototype pages, plus the
- * "press R to switch recipient" hint. Uses plain anchors so it works with the
- * app's reload-based pathname routing.
+ * Fixed top-center route switcher shared by the prototype pages. Uses plain
+ * anchors so it works with the app's reload-based pathname routing. (The
+ * "press R" tip lives only on the home page.)
  */
-export function RouteNav({ hint = true }: { hint?: boolean }) {
+export function RouteNav() {
   const path = window.location.pathname.replace(/\/$/, '') || '/';
   return (
     <nav className="route-nav" aria-label="Prototype">
@@ -29,11 +29,6 @@ export function RouteNav({ hint = true }: { hint?: boolean }) {
           </a>
         ))}
       </div>
-      {hint && (
-        <span className="route-nav__hint">
-          Press <kbd>R</kbd> to switch recipient
-        </span>
-      )}
     </nav>
   );
 }

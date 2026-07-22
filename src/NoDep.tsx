@@ -106,7 +106,7 @@ export default function NoDep() {
         </CustomBeam>
       </main>
 
-      <DialRoot theme={resolvedTheme} position="bottom-right" defaultOpen mode="popover" />
+      <DialRoot theme={resolvedTheme} position="top-right" defaultOpen={false} mode="popover" />
     </div>
   );
 }

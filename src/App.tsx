@@ -12,6 +12,7 @@ import ChatInput, {
 } from './components/ChatInput';
 import { ChipGroup } from './components/Chips';
 import { RouteNav } from './components/RouteNav';
+import { ThemeToggle } from './components/ThemeToggle';
 import type { BeamSettings, BeamColor } from './beam';
 import './App.css';
 
@@ -33,6 +34,7 @@ export function useSystemDark() {
 export default function App() {
   const [type, setType] = useState<LineType>('Multi line');
   const [recipient, setRecipient] = useState<Recipient>('Copilot');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   // ---- live interaction → derived field state ----
   const [value, setValue] = useState('');
@@ -50,6 +52,11 @@ export default function App() {
   const isEva = recipient === 'Copilot';
 
   const handleSubmit = () => {
+    // Care team: sending just resets the field — no pausable processing state
+    if (!isEva) {
+      setValue('');
+      return;
+    }
     if (processing) {
       setProcessing(false); // stop
       return;
@@ -58,11 +65,10 @@ export default function App() {
     setValue(''); // clear old text immediately — it should not linger while processing
   };
 
-  // The page shows both themes at once (dark top half, light bottom half), so the
-  // root (header/panel) is fixed dark and each half scopes its own theme.
+  // Single theme, dark by default; the top-right selector flips it.
   useEffect(() => {
-    document.documentElement.dataset.theme = 'dark';
-  }, []);
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   // press "r" to toggle recipient (to preview the switch animation) — ignored while
   // typing in a field or with a modifier held (so Cmd/Ctrl+R still reloads).
@@ -139,6 +145,7 @@ export default function App() {
       );
     } else {
       setEvaSignal(false);
+      setProcessing(false); // Care team is never in a pausable processing state
     }
     return () => window.clearTimeout(evaTimer.current);
   }, [recipient]);
@@ -209,11 +216,11 @@ export default function App() {
     roll: { blur: beam.rollBlur, travel: beam.rollTravel, fade: beam.rollFade },
   };
 
-  // both beam versions (border-beam + reconstruction) for a given theme, 40px apart
-  const renderPair = (t: 'dark' | 'light') => (
-    <div className="half" data-theme={t}>
+  // both beam versions (border-beam + dependency-free reconstruction), centred & stacked
+  const pair = (
+    <>
       {/* border-beam version */}
-      <Beam settings={beamFor(t)}>
+      <Beam settings={beamFor(theme)}>
         <ChatInput {...fieldProps} />
       </Beam>
 
@@ -228,27 +235,25 @@ export default function App() {
         blurOpacity={cb.blurOpacity}
         duration={cb.duration}
         radius={type === 'Multi line' ? cb.radius : 9999}
-        brightness={t === 'light' ? 1.7 : 1}
-        saturation={t === 'light' ? 0.7 : 1}
+        brightness={theme === 'light' ? 1.7 : 1}
+        saturation={theme === 'light' ? 0.7 : 1}
       >
         <ChatInput {...fieldProps} />
       </CustomBeam>
-    </div>
+    </>
   );
 
   return (
     <div className="stage">
       <RouteNav />
+      <ThemeToggle theme={theme} onToggle={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))} />
       <header className="chips-bar">
         <ChipGroup label="Type" options={TYPES} value={type} onChange={setType} />
       </header>
 
-      <main className="stage__split">
-        {renderPair('dark')}
-        {renderPair('light')}
-      </main>
+      <main className="stage__center stage__center--stack">{pair}</main>
 
-      <DialRoot theme="dark" position="bottom-right" defaultOpen mode="popover" />
+      <DialRoot theme={theme} position="top-right" defaultOpen={false} mode="popover" />
     </div>
   );
 }

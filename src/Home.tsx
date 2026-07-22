@@ -4,12 +4,12 @@ import './Home.css';
 
 const CARDS = [
   {
-    href: '/beams',
+    href: '/input',
     label: 'Chat input field',
     desc: 'Halo treatments and states',
   },
   {
-    href: '/reply',
+    href: '/header',
     label: 'Chat input field header',
     desc: 'Banner entry and morphing animations.',
   },

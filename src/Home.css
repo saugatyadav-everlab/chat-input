@@ -35,6 +35,9 @@
 }
 
 .home__cards {
+  width: 480px;
+  max-width: 100%;
+  align-self: center;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -46,16 +49,17 @@
   flex-direction: column;
   gap: 4px;
   padding: 20px;
-  border: 1px solid var(--hairline);
   border-radius: var(--radius-4xl);
   background: var(--bg-tertiary);
   color: inherit;
   text-decoration: none;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease;
 }
 .home__card:hover {
-  border-color: var(--fg-tertiary);
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.12); /* subtle lighten (dark) */
+}
+[data-theme='light'] .home__card:hover {
+  background: rgba(0, 0, 0, 0.07); /* subtle darken (light) */
 }
 .home__card-label {
   font-size: 16px;

@@ -1,3 +1,15 @@
+/* Centered anchor: the input's bottom is fixed near the vertical center and the
+   banner grows UPWARD from it (the input never moves). Two grid rows split the
+   viewport; the card sits in the top row aligned to its bottom edge (the centre
+   line, nudged down ~half the input so the field reads as centred). */
+.stage__center--anchor {
+  display: grid;
+  grid-template-rows: calc(50% + 56px) 1fr;
+  justify-items: center;
+  align-items: end;
+  padding: 0 24px;
+}
+
 /* ===== Reply-mode input: chat field with an animated header on top ===== */
 .rf {
   width: min(720px, calc(100vw - 32px)); /* matches ChatInput's .ci width */
@@ -88,6 +100,7 @@
   min-width: 0;
   font-size: 14px;
   line-height: 18px;
+  font-weight: 500;
   color: var(--fg-primary);
 }
 /* secondary button: outlined/subtle rather than a solid fill */

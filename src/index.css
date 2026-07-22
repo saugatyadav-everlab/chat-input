@@ -92,6 +92,13 @@ select {
   -webkit-font-smoothing: inherit;
 }
 
+/* DialKit sits as a small persistent trigger at the top-right, just left of the
+   theme toggle (34px wide at right:16 + 8px gap), and expands downward so it
+   doesn't cover the centred field by default. */
+.dialkit-panel {
+  right: 58px !important;
+}
+
 /* A "static" beam: pause the traveling/breathing CSS animations so the beam is
    shown but frozen. (border-beam draws its layers on ::before/::after and the
    [data-beam-bloom] child of the wrapper.) */

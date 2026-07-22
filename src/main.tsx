@@ -8,14 +8,14 @@ import Home from './Home';
 import './index.css';
 
 // tiny pathname-based routing (no router dependency)
-// `/` is the landing selector; the beam homepage now lives at `/beams`.
+// `/` is the landing selector; the chat-input page lives at `/input`.
 const path = window.location.pathname.replace(/\/$/, '');
 const Route =
   path === '/nodep'
     ? NoDep
-    : path === '/reply'
+    : path === '/header'
     ? ReplyMode
-    : path === '/beams'
+    : path === '/input'
     ? App
     : Home;
 

@@ -12,10 +12,10 @@
   box-sizing: border-box;
 }
 
-/* stack the two beam versions vertically, 80px apart */
+/* stack the two beam versions vertically, 40px apart */
 .stage__center--stack {
   flex-direction: column;
-  gap: 80px;
+  gap: 40px;
 }
 
 /* pin the field to the bottom (real chat UI) — it grows upward, input stays put */
@@ -76,6 +76,16 @@
   font-size: 16px;
   cursor: pointer;
   transition: background 0.15s ease;
+}
+/* fixed top-right mode selector (above the chips-bar glass and DialKit) */
+.theme-toggle--corner {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  margin: 0;
+  z-index: 60;
+  background: var(--chip-bg);
+  backdrop-filter: blur(8px);
 }
 .theme-toggle:hover {
   background: var(--chip-bg-active);

@@ -5,6 +5,7 @@ import 'dialkit/styles.css';
 
 import { Beam } from './BeamLayer';
 import { RouteNav } from './components/RouteNav';
+import { ThemeToggle } from './components/ThemeToggle';
 import { Icon } from './components/icons';
 import type { BeamSettings } from './beam';
 import { ToggleChip } from './components/Chips';
@@ -48,6 +49,7 @@ export default function ReplyMode() {
       evaTimer.current = window.setTimeout(() => setEvaSignal(false), 1800);
     } else {
       setEvaSignal(false);
+      setProcessing(false); // Care team is never in a pausable processing state
     }
     return () => window.clearTimeout(evaTimer.current);
   }, [recipient]);
@@ -64,6 +66,11 @@ export default function ReplyMode() {
     ? 'Active'
     : 'Rest';
   const handleSubmit = () => {
+    // Care team: sending just resets the field — no pausable processing state
+    if (recipient !== 'Copilot') {
+      setValue('');
+      return;
+    }
     if (processing) return setProcessing(false);
     setProcessing(true);
     setValue('');
@@ -192,22 +199,15 @@ export default function ReplyMode() {
   return (
     <div className="stage">
       <RouteNav />
+      <ThemeToggle theme={theme} onToggle={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))} />
       <header className="chips-bar">
         <ToggleChip label="Care assigned" value={careAssigned} onChange={setCareAssigned} />
         <ToggleChip label="Reply owed" value={replyOwed} onChange={setReplyOwed} />
-        <button
-          type="button"
-          className="theme-toggle"
-          onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
-          aria-label="Toggle theme"
-        >
-          {theme === 'dark' ? '☾' : '☀'}
-        </button>
       </header>
 
       {/* input pinned to the bottom (real chat UI): the header grows upward,
           the input itself never moves */}
-      <main className="stage__center stage__center--bottom">
+      <main className="stage__center stage__center--anchor">
         <div className="rf">
           {/* one persistent header container: its real `height` animates to fit
               whatever content comes next (Care↔Eva, or →0 when no care team is
@@ -277,7 +277,7 @@ export default function ReplyMode() {
         </div>
       </main>
 
-      <DialRoot theme={theme} position="bottom-right" defaultOpen mode="popover" />
+      <DialRoot theme={theme} position="top-right" defaultOpen={false} mode="popover" />
     </div>
   );
 }
