@@ -107,11 +107,12 @@ export default function ReplyMode() {
     show: { opacity: 1, y: 0, transition: entry },
     exit: { opacity: 0, y: cfg.childShift, transition: entry }, // fade + slide back
   };
-  // avatar: scale from centre + opacity (scale up in, scale down out)
+  // avatar / question icon: scale from centre + opacity + blur (blurred while
+  // changing, sharp once settled — feels softer on the swap)
   const avatarItem = {
-    hidden: { opacity: 0, scale: 0.6 },
-    show: { opacity: 1, scale: 1, transition: entry },
-    exit: { opacity: 0, scale: 0.6, transition: entry },
+    hidden: { opacity: 0, scale: 0.6, filter: 'blur(4px)' },
+    show: { opacity: 1, scale: 1, filter: 'blur(0px)', transition: entry },
+    exit: { opacity: 0, scale: 0.6, filter: 'blur(4px)', transition: entry },
   };
 
   const isEva = recipient === 'Copilot';
