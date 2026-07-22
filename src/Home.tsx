@@ -33,9 +33,6 @@ export default function Home() {
             <a key={c.href} className="home__card" href={c.href}>
               <span className="home__card-label">{c.label}</span>
               <span className="home__card-desc">{c.desc}</span>
-              <span className="home__card-go" aria-hidden>
-                →
-              </span>
             </a>
           ))}
         </div>

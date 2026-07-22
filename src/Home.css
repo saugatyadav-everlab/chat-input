@@ -67,14 +67,6 @@
   line-height: 18px;
   color: var(--fg-tertiary);
 }
-.home__card-go {
-  margin-top: auto;
-  font-size: 16px;
-  color: var(--fg-tertiary);
-}
-.home__card:hover .home__card-go {
-  color: var(--fg-primary);
-}
 
 .home__tip {
   margin: 0;
