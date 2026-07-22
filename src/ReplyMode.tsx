@@ -4,6 +4,7 @@ import { useDialKit, DialRoot } from 'dialkit';
 import 'dialkit/styles.css';
 
 import { Beam } from './BeamLayer';
+import { RouteNav } from './components/RouteNav';
 import { Icon } from './components/icons';
 import type { BeamSettings } from './beam';
 import { ToggleChip } from './components/Chips';
@@ -17,6 +18,7 @@ import './ReplyMode.css';
 
 export default function ReplyMode() {
   const [recipient, setRecipient] = useState<Recipient>('Care team');
+  const [careAssigned, setCareAssigned] = useState(true);
   const [replyOwed, setReplyOwed] = useState(true);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   useEffect(() => {
@@ -71,7 +73,7 @@ export default function ReplyMode() {
     transition: { type: 'spring', bounce: 0.35, visualDuration: 0.3 },
     stagger: [0.1, 0, 0.3, 0.01], // delay between banner children
     childDelay: [0.08, 0, 0.5, 0.01], // wait for the banner to start opening
-    childShift: [8, 0, 32, 1], // how far each child slides up (px)
+    childShift: [2, 0, 32, 1], // how far each child slides up (px)
   });
   const entry = cfg.transition as unknown as Transition;
 
@@ -91,8 +93,10 @@ export default function ReplyMode() {
   };
 
   const isEva = recipient === 'Copilot';
-  // Care team → header only if a reply is owed; Eva → always prompt to switch back
-  const showHeader = isEva || replyOwed;
+  // A banner needs a care team assigned. In Care team you always see "Replying to …";
+  // in Eva the "Done asking Eva?" banner only appears while a reply is owed
+  // (nothing to prompt back to otherwise).
+  const showHeader = careAssigned && (!isEva || replyOwed);
   const headerKey = isEva ? 'eva' : 'care';
 
   // same border-beam halo as the base route; flashes on the Eva switch
@@ -128,7 +132,9 @@ export default function ReplyMode() {
 
   return (
     <div className="stage">
+      <RouteNav />
       <header className="chips-bar">
+        <ToggleChip label="Care assigned" value={careAssigned} onChange={setCareAssigned} />
         <ToggleChip label="Reply owed" value={replyOwed} onChange={setReplyOwed} />
         <button
           type="button"
@@ -144,33 +150,36 @@ export default function ReplyMode() {
           the input itself never moves */}
       <main className="stage__center stage__center--bottom">
         <div className="rf">
-          <AnimatePresence initial mode="wait">
-            {showHeader && (
-              <motion.div
-                key={headerKey}
-                className="rf-header"
-                initial={{ height: 0 }}
-                animate={{ height: 'auto' }}
-                exit={{ height: 0 }}
-                transition={entry}
-              >
-                <div className="rf-header__inner">
+          {/* one persistent header container: `layout` morphs its height to fit
+              whatever content comes next (Care↔Eva, or →nothing when no care team
+              is assigned) instead of fully collapsing and re-expanding */}
+          <motion.div className="rf-header" layout transition={entry}>
+            <AnimatePresence mode="popLayout" initial={false}>
+              {showHeader && (
+                <motion.div
+                  key={headerKey}
+                  className="rf-header__inner"
+                  layout
+                  initial={false}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
                   {isEva ? (
                     <motion.div className="rf-suggestion" variants={container} initial="hidden" animate="show">
-                      <motion.span className="rf-suggestion__icon" variants={item}>
+                      <motion.span className="rf-suggestion__icon" variants={avatarItem}>
                         <Icon name="help" />
                       </motion.span>
                       <motion.span className="rf-suggestion__text" variants={item}>
                         Done asking Eva?
                       </motion.span>
+                      {/* CTA (back to care team) — the Eva banner only renders while a
+                          reply is owed, so this always accompanies it */}
                       <motion.button
                         type="button"
                         className="rf-suggestion__cta"
                         variants={item}
-                        onClick={() => {
-                          setRecipient('Care team');
-                          setReplyOwed(true);
-                        }}
+                        onClick={() => setRecipient('Care team')}
                       >
                         Reply Dr. Steven
                       </motion.button>
@@ -191,10 +200,10 @@ export default function ReplyMode() {
                       </motion.span>
                     </motion.div>
                   )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
           <Beam settings={beamSettings} fill>
             <ChatInput {...fieldProps} />

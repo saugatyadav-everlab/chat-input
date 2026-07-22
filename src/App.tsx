@@ -11,6 +11,7 @@ import ChatInput, {
   type LineType,
 } from './components/ChatInput';
 import { ChipGroup } from './components/Chips';
+import { RouteNav } from './components/RouteNav';
 import type { BeamSettings, BeamColor } from './beam';
 import './App.css';
 
@@ -237,6 +238,7 @@ export default function App() {
 
   return (
     <div className="stage">
+      <RouteNav />
       <header className="chips-bar">
         <ChipGroup label="Type" options={TYPES} value={type} onChange={setType} />
       </header>

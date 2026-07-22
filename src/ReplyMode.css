@@ -13,11 +13,16 @@
   max-width: none;
 }
 
-/* animated header wrapper (Framer animates height/opacity) */
+/* animated header wrapper — Framer `layout` morphs its height to fit the next
+   content; `position: relative` anchors the popLayout child that gets
+   absolutely positioned while it fades out during a swap */
 .rf-header {
+  position: relative;
   overflow: hidden;
 }
 .rf-header__inner {
+  box-sizing: border-box;
+  width: 100%;
   padding: 12px; /* space/xs */
 }
 
