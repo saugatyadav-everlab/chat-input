@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, type Transition } from 'motion/react';
 import { useDialKit, DialRoot } from 'dialkit';
 import 'dialkit/styles.css';
@@ -72,24 +72,39 @@ export default function ReplyMode() {
   const cfg = useDialKit('Header entry', {
     transition: { type: 'spring', bounce: 0.35, visualDuration: 0.3 },
     stagger: [0.1, 0, 0.3, 0.01], // delay between banner children
-    childDelay: [0.08, 0, 0.5, 0.01], // wait for the banner to start opening
+    childDelay: [0, 0, 0.5, 0.01], // wait for the banner to start opening
     childShift: [2, 0, 32, 1], // how far each child slides up (px)
   });
   const entry = cfg.transition as unknown as Transition;
 
-  // staggered entry for the banner's children (siblings animate in one after another)
-  const container = {
-    hidden: {},
-    show: { transition: { staggerChildren: cfg.stagger, delayChildren: cfg.childDelay } },
-  };
+  // The container's height animation is tuned per kind of transition (decoupled
+  // from the child animations above):
+  //  - "Banner morph"  → banner ↔ banner (Care ↔ Eva): small delta, tight feel
+  //  - "Banner reveal" → banner ↔ none (grow from 0 / collapse to 0): full travel
+  const morphCfg = useDialKit('Banner morph', {
+    transition: { type: 'spring', bounce: 0.3, visualDuration: 0.4 },
+  });
+  const morphTx = morphCfg.transition as unknown as Transition;
+  const revealCfg = useDialKit('Banner reveal', {
+    transition: { type: 'spring', bounce: 0.2, visualDuration: 0.3 },
+    childDelay: [0.02, 0, 0.5, 0.01], // children wait for the banner to open, THEN scale in (so the scale is visible, not masked by the reveal)
+    collapseDelay: [0.1, 0, 0.5, 0.01], // slight lead so children start leaving, then the banner drops (overlapping)
+  });
+  const revealTx = revealCfg.transition as unknown as Transition;
+
+  // shell just propagates the variant label (hidden/show/exit) down to the children,
+  // so on exit the children animate away (rather than the whole block hard-fading)
+  const shell = { hidden: {}, show: {}, exit: {} };
   const item = {
     hidden: { opacity: 0, y: cfg.childShift },
     show: { opacity: 1, y: 0, transition: entry },
+    exit: { opacity: 0, y: cfg.childShift, transition: entry }, // fade + slide back
   };
-  // avatar: scale from centre + opacity (no slide)
+  // avatar: scale from centre + opacity (scale up in, scale down out)
   const avatarItem = {
     hidden: { opacity: 0, scale: 0.6 },
     show: { opacity: 1, scale: 1, transition: entry },
+    exit: { opacity: 0, scale: 0.6, transition: entry },
   };
 
   const isEva = recipient === 'Copilot';
@@ -98,6 +113,50 @@ export default function ReplyMode() {
   // (nothing to prompt back to otherwise).
   const showHeader = careAssigned && (!isEva || replyOwed);
   const headerKey = isEva ? 'eva' : 'care';
+
+  // Measure the natural height of the current banner content and animate the
+  // container's real `height` to it. This keeps the container's grow/shrink fully
+  // decoupled from the children: no Framer `layout` projection means the child
+  // animations aren't scale-corrected over the container's (tunable) duration.
+  // The measure wrapper is statically positioned, so the outgoing (popLayout-
+  // absolute) banner doesn't affect its offsetHeight — we always read the height
+  // of the incoming content.
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [headerH, setHeaderH] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const el = contentRef.current;
+    if (el) setHeaderH(showHeader ? el.offsetHeight : 0);
+  }, [showHeader, headerKey, recipient, careAssigned, replyOwed]);
+
+  // Choose the height spring by kind of transition: growing from / collapsing to
+  // 0 is a "reveal" (full travel); otherwise it's a banner↔banner "morph".
+  // `prevH` holds the previously-committed height so we can tell which one this is.
+  const prevHRef = useRef<number | null>(null);
+  const isReveal = headerH === 0 || prevHRef.current === 0 || prevHRef.current === null;
+  const isCollapsing = headerH === 0;
+  // Reveal → banner↔none; morph → banner↔banner. On collapse, hold the height for
+  // `collapseDelay` so the children animate away first, then the banner drops.
+  const containerTx: Transition = isReveal
+    ? isCollapsing
+      ? ({ ...(revealTx as object), delay: revealCfg.collapseDelay } as Transition)
+      : revealTx
+    : morphTx;
+  useEffect(() => {
+    if (headerH !== null) prevHRef.current = headerH;
+  }, [headerH]);
+
+  // staggered entry for the banner's children. The lead-in delay is state-specific:
+  // children wait `revealCfg.childDelay` on a grow, but start with the banner on a morph.
+  const container = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: cfg.stagger,
+        delayChildren: isReveal ? revealCfg.childDelay : cfg.childDelay,
+      },
+    },
+    exit: { transition: { staggerChildren: 0 } }, // on collapse, all children leave together (no stagger)
+  };
 
   // same border-beam halo as the base route; flashes on the Eva switch
   const beamSettings: BeamSettings = {
@@ -150,23 +209,29 @@ export default function ReplyMode() {
           the input itself never moves */}
       <main className="stage__center stage__center--bottom">
         <div className="rf">
-          {/* one persistent header container: `layout` morphs its height to fit
-              whatever content comes next (Care↔Eva, or →nothing when no care team
-              is assigned) instead of fully collapsing and re-expanding */}
-          <motion.div className="rf-header" layout transition={entry}>
-            <AnimatePresence mode="popLayout" initial={false}>
-              {showHeader && (
-                <motion.div
-                  key={headerKey}
-                  className="rf-header__inner"
-                  layout
-                  initial={false}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                >
+          {/* one persistent header container: its real `height` animates to fit
+              whatever content comes next (Care↔Eva, or →0 when no care team is
+              assigned) instead of fully collapsing and re-expanding. Animating
+              height (not Framer `layout`) keeps this decoupled from the children. */}
+          <motion.div
+            className="rf-header"
+            initial={false}
+            animate={headerH === null ? undefined : { height: headerH }}
+            transition={containerTx}
+          >
+            <div className="rf-header__measure" ref={contentRef}>
+              <AnimatePresence mode="popLayout" initial={false}>
+                {showHeader && (
+                  <motion.div
+                    key={headerKey}
+                    className="rf-header__inner"
+                    variants={shell}
+                    initial="hidden"
+                    animate="show"
+                    exit="exit"
+                  >
                   {isEva ? (
-                    <motion.div className="rf-suggestion" variants={container} initial="hidden" animate="show">
+                    <motion.div className="rf-suggestion" variants={container}>
                       <motion.span className="rf-suggestion__icon" variants={avatarItem}>
                         <Icon name="help" />
                       </motion.span>
@@ -181,11 +246,11 @@ export default function ReplyMode() {
                         variants={item}
                         onClick={() => setRecipient('Care team')}
                       >
-                        Reply Dr. Steven
+                        Switch to care team
                       </motion.button>
                     </motion.div>
                   ) : (
-                    <motion.div className="rf-prefix" variants={container} initial="hidden" animate="show">
+                    <motion.div className="rf-prefix" variants={container}>
                       <motion.img className="rf-avatar" variants={avatarItem} src="/icons/steven.png" alt="" />
                       <motion.div className="rf-replying" variants={container}>
                         <motion.div className="rf-replying__label" variants={item}>
@@ -200,9 +265,10 @@ export default function ReplyMode() {
                       </motion.span>
                     </motion.div>
                   )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
 
           <Beam settings={beamSettings} fill>

@@ -20,6 +20,11 @@
   position: relative;
   overflow: hidden;
 }
+/* statically positioned so the outgoing (absolute) banner is excluded from its
+   offsetHeight — we measure only the incoming content */
+.rf-header__measure {
+  width: 100%;
+}
 .rf-header__inner {
   box-sizing: border-box;
   width: 100%;
@@ -85,20 +90,26 @@
   line-height: 18px;
   color: var(--fg-primary);
 }
+/* secondary button: outlined/subtle rather than a solid fill */
 .rf-suggestion__cta {
   flex: none;
   height: 28px;
   display: inline-flex;
   align-items: center;
-  padding: 0 8px; /* space/2xs */
-  border: none;
+  padding: 0 10px;
+  border: 1px solid var(--hairline);
   border-radius: var(--radius-full);
-  background: var(--fg-primary); /* black in light, white in dark */
-  color: var(--screen-bg);
+  background: transparent;
+  color: var(--fg-primary);
   font-size: 12px;
   line-height: 14px;
   font-weight: 570;
   cursor: pointer;
   white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.rf-suggestion__cta:hover {
+  background: var(--chip-bg);
+  border-color: var(--fg-tertiary);
 }
 
